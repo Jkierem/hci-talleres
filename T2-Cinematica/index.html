@@ -1,0 +1,123 @@
+<html>
+    <head>
+        <title>My first three.js app</title>
+        <style>
+            body { margin: 0; }
+            canvas { display: block; }
+        </style>
+    </head>
+    <body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+        <script>
+            const { Vector3: Vector } = THREE;
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            document.body.appendChild( renderer.domElement );
+            
+            var l1=5
+            var l2=5
+            var geometry = new THREE.BoxGeometry(1,l1,1);
+            
+            var geometry2 = new THREE.BoxGeometry(2,2,2);
+            var geometryPoint = new THREE.BoxGeometry(0.05,0.05,0.05);
+            var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+            var material1 = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+            var material2 = new THREE.MeshBasicMaterial( { color: 0x00ffff } );
+            var cube = new THREE.Mesh( geometry, material );
+            var cube2 = new THREE.Mesh( geometry, material1 );
+            var cube3 = new THREE.Mesh( geometry2, material2 );
+            scene.add( cube3 );
+            var contenedor=new THREE.Object3D();            
+            var contenedor2=new THREE.Object3D();
+            
+            cube.position.y=-l1/2
+            contenedor.add(cube)
+            cube2.position.y=-l1/2
+            contenedor2.add(cube2)
+            contenedor2.position.y=-l1
+            contenedor.add( contenedor2);
+            scene.add( contenedor );
+            camera.position.z = 15;
+
+            var ang=[0,0]
+            cube3.position.x = 3;
+            cube3.position.y = 5;
+            var calcular=function(x,y)
+            {
+                var a2=Math.PI-Math.acos((l1*l1+l2*l2-x*x-y*y)/(2*l1*l2));
+                var a1=Math.atan(y/x)-Math.atan((l2*Math.sin(a2))/(l1+l2*Math.cos(a2)));
+
+                ang=[a1,a2];
+            }
+
+            const clamp = (min,max) => (x) => {
+                if(x < min){
+                    return min
+                }else if(x > max){
+                    return max
+                }else{
+                    return x
+                }
+            }
+
+            let init = null;
+            const limit = 3;
+            const restrict = (vect) => {
+                if( init == null ){
+                    init = new Vector().copy(vect)
+                }
+                const dist = init.distanceTo(vect)
+                if( dist > limit ){
+                    return new Vector()
+                        .copy(init)
+                        .sub(vect)
+                        .normalize()
+                        .multiplyScalar(-limit)
+                        .add(init)
+                }
+                return vect
+            }
+
+            const translate = (vec,obj) => {
+                obj.position.x = vec.x;
+                obj.position.y = vec.y;
+                obj.position.z = vec.z;
+            }
+
+            const xclamp = clamp(-2,2);
+            var t=0;
+            let delta = 0.02;
+            let frames = 0
+            var animate = function () {
+                requestAnimationFrame( animate );
+                t+=delta
+                const next = new Vector(
+                    0.05*t*Math.cos(t)+4,
+                    0.05*t*Math.sin(t)+4,
+                    -0.05*t,
+                )
+                translate(restrict(next),cube3)
+                //cube3.position.x = xclamp(0.05*t*Math.cos(t))+5
+                //cube3.position.y = xclamp(0.05*t*Math.sin(t))+4
+                //cube3.position.z = Math.sin(0.1*t)
+                var cubeA = new THREE.Mesh( geometryPoint, material );
+                cubeA.position.x=cube3.position.x
+                cubeA.position.y=cube3.position.y
+                cubeA.position.z=cube3.position.z
+                scene.add( cubeA );
+                calcular(cube3.position.x,cube3.position.y);
+                contenedor.rotation.x = Math.atan(cube3.position.z/cube3.position.y);
+                contenedor.rotation.z = (ang[0]+Math.PI/2);
+                contenedor2.rotation.z = ang[1]
+                renderer.render( scene, camera );
+            };
+
+ 
+
+            animate();
+        </script>
+    </body>
+</html
