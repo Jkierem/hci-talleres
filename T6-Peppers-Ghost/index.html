@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Pepper's Ghost</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" href="reset.css">
+	</head>
+
+	<body>
+		<div id="info">
+		</div>
+
+		<script type="module">
+
+			import * as THREE from './lib/build/three.module.js';
+
+			import { DDSLoader } from './lib/examples/jsm/loaders/DDSLoader.js';
+			import { MTLLoader } from './lib/examples/jsm/loaders/MTLLoader.js';
+			import { OBJLoader } from './lib/examples/jsm/loaders/OBJLoader.js';
+			import { PeppersGhostEffect } from './lib/examples/jsm/effects/PeppersGhostEffect.js';
+
+			var container;
+
+			var camera, scene, renderer, group, effect;
+
+			var mouseX = 0, mouseY = 0;
+
+			const rotate = (x=0,y=0,z=0) => (obj) => {
+				obj.rotation.x += x;
+				obj.rotation.y += y;
+				obj.rotation.z += z;
+				return obj;
+			}
+
+			const translate = (x=0,y=0,z=0) => obj => {
+				obj.position.x += x;
+				obj.position.y += y;
+				obj.position.z += z;
+				return obj;
+			}
+
+			const car = {
+				_value: undefined,
+				get(){
+					return this._value;
+				},
+				set(x){
+					this._value = x;
+					return this
+				},
+				map(f){
+					if( !this.isNone() ){
+						this._value = f(this._value);
+					}
+					return this;
+				},
+				isNone(){
+					return this._value === undefined
+				}
+			}
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+
+				// scene
+
+				scene = new THREE.Scene();
+
+				var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+				scene.add( ambientLight );
+
+				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+				camera.add( pointLight );
+				scene.add( camera );
+
+				// model
+
+				var onError = function () {
+					alert("Algo salio mal cargando el modelo...")
+				};
+
+				var manager = new THREE.LoadingManager();
+				manager.addHandler( /\.dds$/i, new DDSLoader() );
+
+				new MTLLoader( manager )
+					.setPath( 'car/' )
+					.load( 'car.mtl', function ( materials ) {
+
+						materials.preload();
+
+						new OBJLoader( manager )
+							.setMaterials( materials )
+							.setPath( 'car/' )
+							.load( 'car.obj', function ( object ) {
+								car.set( object ).map(translate(0,0));
+								scene.add( object );
+							}, x => x, onError );
+
+					} );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				effect = new PeppersGhostEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.cameraDistance = 13;
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				effect.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			//
+
+			function animate() {
+				requestAnimationFrame( animate );
+				car.map(rotate(0,0.001))
+				effect.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
