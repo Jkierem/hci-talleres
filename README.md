@@ -3,4 +3,4 @@
 - [X] Taller 4: Aplicación de realidad virtual de una habitación con una interacción de prender y apagar la luz por medio del trazado de rayos ( ThreeJS)
 - [X] Taller 5: Aplicación de realidad aumentada, cargar un modelo cualquiera y mostrarlo en el celular (Unity 3d+ vuforia )
 - [X] Taller 6: Holograma piramidal, cargar un modelo cualquiera y mostrarlo en la pirámide (Threejs )
-- [ ] Taller 7: Carro con sensores que esquive obstáculos y recorra una pista básica (Unity 3d)
+- [X] Taller 7: Carro con sensores que esquive obstáculos y recorra una pista básica (Unity 3d)
