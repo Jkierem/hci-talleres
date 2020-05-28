@@ -4,3 +4,4 @@
 - [X] Taller 5: Aplicación de realidad aumentada, cargar un modelo cualquiera y mostrarlo en el celular (Unity 3d+ vuforia )
 - [X] Taller 6: Holograma piramidal, cargar un modelo cualquiera y mostrarlo en la pirámide (Threejs )
 - [X] Taller 7: Carro con sensores que esquive obstáculos y recorra una pista básica (Unity 3d)
+- [X] Propuesta de proyecto
